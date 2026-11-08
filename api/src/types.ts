@@ -1,4 +1,3 @@
-import z from "zod"
 import type { AuthType } from "./utils/auth"
 
 export type Bindings = {
@@ -17,11 +16,3 @@ export type Variables = {
     user: AuthType['user']
     session: AuthType['session']
 }
-
-export const createHomeSchema = z.object({
-    name: z.string().trim().min(1).max(100),
-})
-
-export const createMemberSchema = z.object({
-    name: z.string().trim().min(1).max(100),
-}).strict()

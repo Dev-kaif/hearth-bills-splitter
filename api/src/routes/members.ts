@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
-import { createMemberSchema, type Bindings, type Variables } from '../types'
-import { apiError } from '../utils/validation'
+import { type Bindings, type Variables } from '../types'
+import { apiError, createMemberSchema } from '../utils/validation'
 
 const router = new Hono<{
     Bindings: Bindings
@@ -68,6 +68,7 @@ router.post('/homes/:homeId/members', async (c) => {
                 FROM homes h
                 WHERE h.id = ?
                   AND h.owner_user_id = ?
+                  AND h.archived_at IS NULL
                 RETURNING id, home_id, name, position
             `)
             .bind(

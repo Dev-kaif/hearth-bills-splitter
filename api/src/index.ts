@@ -5,6 +5,7 @@ import { authMiddleware } from './middleware/authorize';
 import auth from './routes/auth'
 import homes from './routes/homes'
 import members from './routes/members'
+import bills from './routes/bills'
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>({
     strict: false,
@@ -30,7 +31,7 @@ app.use('*', authMiddleware)
 
 const api = app.basePath('/api')
 
-const routes = [homes, members,] as const
+const routes = [homes, members, bills,] as const
 
 routes.forEach((route) => {
     api.route('/', route)

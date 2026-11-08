@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
-import { z } from 'zod'
-import { createHomeSchema, type Bindings, type Variables } from '../types'
+import { type Bindings, type Variables } from '../types'
+import { createHomeSchema } from '../utils/validation'
 
 const router = new Hono<{
     Bindings: Bindings
