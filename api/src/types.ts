@@ -16,3 +16,21 @@ export type Variables = {
     user: AuthType['user']
     session: AuthType['session']
 }
+
+export type HomeStatusRow = {
+    member_count: number
+}
+
+export type ShareRow = {
+    id: string
+    member_id: string
+    amount_cents: number
+    paid_at: string | null
+}
+
+export type MemberRow = {
+    id: string
+    home_id: string
+    name: string
+    position: number
+}

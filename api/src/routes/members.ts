@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { type Bindings, type Variables } from '../types'
+import { type Bindings, type MemberRow, type Variables } from '../types'
 import { apiError, createMemberSchema } from '../utils/validation'
 
 const router = new Hono<{
@@ -7,12 +7,6 @@ const router = new Hono<{
     Variables: Variables
 }>()
 
-type MemberRow = {
-    id: string
-    home_id: string
-    name: string
-    position: number
-}
 
 router.post('/homes/:homeId/members', async (c) => {
     // Read and validate the request body.

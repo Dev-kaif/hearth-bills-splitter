@@ -1,6 +1,8 @@
 import { Hono } from 'hono'
 import {
     type Bindings,
+    type HomeStatusRow,
+    type ShareRow,
     type Variables,
 } from '../types'
 
@@ -11,16 +13,6 @@ const router = new Hono<{
     Variables: Variables
 }>()
 
-type HomeStatusRow = {
-    member_count: number
-}
-
-type ShareRow = {
-    id: string
-    member_id: string
-    amount_cents: number
-    paid_at: string | null
-}
 
 router.post('/homes/:homeId/bills', async (c) => {
     // parse request body
