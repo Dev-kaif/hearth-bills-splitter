@@ -8,6 +8,8 @@ export type Bindings = {
     FRONTEND_URL: string
     GOOGLE_CLIENT_ID: string
     GOOGLE_CLIENT_SECRET: string
+    /** Test-only Miniflare binding configured in vitest.config.ts. */
+    TEST_AUTH_BYPASS?: string
 }
 
 export type Variables = {
