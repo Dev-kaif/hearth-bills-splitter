@@ -3,6 +3,8 @@ import type { Bindings, Variables } from './types';
 import { cors } from 'hono/cors';
 import { authMiddleware } from './middleware/authorize';
 import auth from './routes/auth'
+import homes from './routes/homes'
+import members from './routes/members'
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>({
     strict: false,
@@ -18,7 +20,7 @@ app.use(
         origin: '*',
         credentials: false,
         allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-        allowHeaders: ['Content-Type', 'Authorization','Idempotency-Key'],
+        allowHeaders: ['Content-Type', 'Authorization', 'Idempotency-Key'],
     }),
 )
 
@@ -28,7 +30,7 @@ app.use('*', authMiddleware)
 
 const api = app.basePath('/api')
 
-const routes = [] as const
+const routes = [homes, members,] as const
 
 routes.forEach((route) => {
     api.route('/', route)

@@ -7,10 +7,19 @@ export const authMiddleware = createMiddleware<{
     Bindings: Bindings
     Variables: Variables
 }>(async (c, next) => {
-    
+
     // This binding is supplied only by the Vitest Miniflare configuration.
     // It is not sourced from a request, and is absent from Wrangler environments.
     if (c.env.TEST_AUTH_BYPASS === 'true') {
+        c.set('user', {
+            id: 'test-user-id',
+        } as Variables['user'])
+
+        c.set('session', {
+            id: 'test-session-id',
+            userId: 'test-user-id',
+        } as Variables['session'])
+
         await next()
         return
     }
