@@ -1,6 +1,8 @@
 import { Hono } from 'hono'
 import {
+    type BillResponse,
     type Bindings,
+    type HomeBillsRow,
     type HomeStatusRow,
     type ShareRow,
     type Variables,
@@ -267,6 +269,147 @@ router.post('/homes/:homeId/bills', async (c) => {
 
         return c.json({
             error: 'Unable to create bill',
+            requestId,
+        }, 500)
+    }
+})
+
+// Get all bills belonging to a home
+router.get('/homes/:homeId/bills', async (c) => {
+    const userId = c.get('user')?.id
+
+    if (!userId) {
+        return apiError(c, 401, 'Unauthorized')
+    }
+
+    const homeId = c.req.param('homeId')
+
+    try {
+        const result = await c.env.DB.prepare(`
+            SELECT
+                b.id AS bill_id,
+                b.title AS bill_title,
+                b.total_cents AS bill_total_cents,
+                b.created_at AS bill_created_at,
+
+                s.id AS share_id,
+                s.member_id AS share_member_id,
+                s.amount_cents AS share_amount_cents,
+                s.paid_at AS share_paid_at,
+
+                m.name AS member_name
+
+            FROM homes h
+
+            LEFT JOIN bills b
+                ON b.home_id = h.id
+
+            LEFT JOIN shares s
+                ON s.bill_id = b.id
+
+            LEFT JOIN members m
+                ON m.id = s.member_id
+
+            WHERE h.id = ?
+                AND h.owner_user_id = ?
+
+            ORDER BY
+                b.created_at DESC,
+                b.id DESC,
+                m.position ASC,
+                m.id ASC
+        `)
+            .bind(homeId, userId)
+            .all<HomeBillsRow>()
+
+        const rows = result.results ?? []
+
+        // No rows means the home doesn't exist or isn't owned by this user.
+        if (rows.length === 0) {
+            return apiError(c, 404, 'Home not found')
+        }
+
+        const billsById = new Map<string, BillResponse>()
+
+        for (const row of rows) {
+            // The home exists but has no bills.
+            if (row.bill_id === null) {
+                continue
+            }
+
+            if (
+                row.bill_title === null ||
+                row.bill_total_cents === null ||
+                row.bill_created_at === null
+            ) {
+                throw new Error('Invalid bill data')
+            }
+
+            if (
+                !Number.isSafeInteger(row.bill_total_cents) ||
+                row.bill_total_cents <= 0
+            ) {
+                throw new Error('Invalid bill total')
+            }
+
+            let bill = billsById.get(row.bill_id)
+
+            if (!bill) {
+                bill = {
+                    id: row.bill_id,
+                    title: row.bill_title,
+                    totalCents: row.bill_total_cents,
+                    createdAt: row.bill_created_at,
+                    shares: [],
+                }
+
+                billsById.set(row.bill_id, bill)
+            }
+
+            // A bill can exist without shares, so skip null share rows.
+            if (row.share_id === null) {
+                continue
+            }
+
+            if (
+                row.share_member_id === null ||
+                row.member_name === null ||
+                row.share_amount_cents === null
+            ) {
+                throw new Error('Invalid bill share relationship')
+            }
+
+            if (
+                !Number.isSafeInteger(row.share_amount_cents) ||
+                row.share_amount_cents < 0
+            ) {
+                throw new Error('Invalid share amount')
+            }
+
+            bill.shares.push({
+                id: row.share_id,
+                memberId: row.share_member_id,
+                memberName: row.member_name,
+                amountCents: row.share_amount_cents,
+                paidAt: row.share_paid_at,
+            })
+        }
+
+        return c.json({
+            bills: Array.from(billsById.values()),
+        }, 200)
+
+    } catch (error) {
+        const requestId = c.req.header('cf-ray') ?? crypto.randomUUID()
+
+        console.error('Failed to retrieve home bills', {
+            requestId,
+            homeId,
+            error,
+        })
+
+        return c.json({
+            error: 'Unable to retrieve bills',
             requestId,
         }, 500)
     }

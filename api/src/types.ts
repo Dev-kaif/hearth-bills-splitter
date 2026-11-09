@@ -21,6 +21,23 @@ export type HomeStatusRow = {
     member_count: number
 }
 
+export type HomeListRow = {
+    id: string
+    name: string
+    created_at: string
+}
+
+export type HomeDetailRow = {
+    home_id: string
+    home_name: string
+    home_created_at: string
+    home_archived_at: string | null
+    member_id: string | null
+    member_name: string | null
+    member_position: number | null
+    member_archived_at: string | null
+}
+
 export type ShareRow = {
     id: string
     member_id: string
@@ -54,4 +71,32 @@ export type BalanceRow = {
     member_id: string | null
     member_name: string | null
     outstanding_cents: number
+}
+
+export type HomeBillsRow = {
+    bill_id: string | null
+    bill_title: string | null
+    bill_total_cents: number | null
+    bill_created_at: string | null
+
+    share_id: string | null
+    share_member_id: string | null
+    share_amount_cents: number | null
+    share_paid_at: string | null
+
+    member_name: string | null
+}
+
+export type BillResponse = {
+    id: string
+    title: string
+    totalCents: number
+    createdAt: string
+    shares: {
+        id: string
+        memberId: string
+        memberName: string
+        amountCents: number
+        paidAt: string | null
+    }[]
 }
