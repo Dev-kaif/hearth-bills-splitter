@@ -34,3 +34,24 @@ export type MemberRow = {
     name: string
     position: number
 }
+
+export type PaymentRow = {
+    id: string
+    bill_id: string
+    member_id: string
+    amount_cents: number
+    paid_at: string | null
+    idempotency_key: string | null
+}
+
+export type IdempotencyOwnerRow = {
+    id: string
+    bill_id: string
+}
+
+
+export type BalanceRow = {
+    member_id: string | null
+    member_name: string | null
+    outstanding_cents: number
+}
