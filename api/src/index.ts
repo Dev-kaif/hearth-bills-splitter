@@ -20,7 +20,7 @@ app.get('/api/health', (c) => {
 app.use(
     '*',
     cors({
-        origin: '*',
+        origin: ['http://localhost:5173'],
         credentials: false,
         allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         allowHeaders: ['Content-Type', 'Authorization', 'Idempotency-Key'],
