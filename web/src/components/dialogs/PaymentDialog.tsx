@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { usePayShare } from '../../hooks/useMutations'
 import type { BillShare } from '../../lib/api/types'
-import { formatINR } from '../../lib/money'
+import { formatUSDCents } from '../../lib/money'
 import { useHousehold } from '../HouseholdContext'
 import { Dialog } from './Dialog'
 
@@ -49,7 +49,7 @@ export function PaymentDialog({
           <span>Payment for</span>
           <b>{share?.memberName ?? 'Household member'}</b>
         </div>
-        <strong>{share ? formatINR(share.amountCents) : ''}</strong>
+        <strong>{share ? formatUSDCents(share.amountCents) : ''}</strong>
       </div>
       {error && (
         <p className="form-error" role="alert">

@@ -19,7 +19,7 @@ The frontend uses the backend's confirmed contracts for:
 - `GET /api/homes/:homeId`, returning `{ id, name, createdAt, archivedAt, members: [{ id, name, position, archivedAt }] }`.
 - `GET /api/homes/:homeId/bills`, returning `{ bills: [{ id, title, totalCents, createdAt, shares: [{ id, memberId, memberName, amountCents, paidAt }] }] }`.
 
-Money is entered as rupees and converted to integer paise before submission. The backend owns equal splitting and remainder distribution.
+Bill amounts are entered in dollars and converted to integer cents before submission. The backend owns equal splitting and remainder distribution.
 
 The home selector uses the first active home by default and lets the user switch between homes. Home members, bills, shares, and balances are loaded from the API through TanStack Query. Query caches are in memory only; application records are not written to localStorage.
 

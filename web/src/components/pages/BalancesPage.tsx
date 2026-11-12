@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { CircleDollarSign, Users } from 'lucide-react'
 import { useBalances } from '../../hooks/useHouseholdQueries'
-import { formatINR } from '../../lib/money'
+import { formatUSDCents } from '../../lib/money'
 import { EmptyState } from '../EmptyState'
 import { useHousehold } from '../HouseholdContext'
 
@@ -17,7 +17,7 @@ export function BalancesPage() {
     refreshHomes,
   } = useHousehold()
   const balances = useBalances(homeId)
-  const total = balances.data?.reduce((sum, balance) => sum + balance.outstandingCents, 0)
+  const total = balances.data?.reduce((sum, balance) => sum + BigInt(balance.outstandingCents), 0n)
   const loadingHousehold = isHomesPending || Boolean(homeId && isHomePending)
   const householdError = homesError ?? homeError
 
@@ -82,7 +82,7 @@ export function BalancesPage() {
         </span>
         <div>
           <span className="metric-label">TOTAL OUTSTANDING</span>
-          <b>{balances.isPending ? '…' : total === undefined ? '—' : formatINR(total)}</b>
+          <b>{balances.isPending ? '…' : total === undefined ? '—' : formatUSDCents(total)}</b>
         </div>
         <small>Sum of unpaid member shares</small>
       </div>
@@ -122,7 +122,7 @@ export function BalancesPage() {
               <span className="member-avatar">{balance.name.charAt(0).toUpperCase()}</span>
               <b>{balance.name}</b>
               <strong className={balance.outstandingCents ? 'amount-due' : 'amount-clear'}>
-                {formatINR(balance.outstandingCents)}
+                {formatUSDCents(balance.outstandingCents)}
               </strong>
             </div>
           ))

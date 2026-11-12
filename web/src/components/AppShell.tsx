@@ -1,6 +1,8 @@
 import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
 import {
   Activity,
+  Check,
+  ChevronDown,
   House,
   ReceiptText,
   Users,
@@ -11,6 +13,7 @@ import {
   X,
 } from 'lucide-react'
 import { useState } from 'react'
+import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui'
 import { authClient } from '../lib/auth/client'
 import { HomeDialog } from './dialogs/HomeDialog'
 import { useHousehold } from './HouseholdContext'
@@ -54,21 +57,56 @@ export function AppShell() {
         <div className="home-switcher">
           <span className="home-avatar">{home?.name.charAt(0).toUpperCase() ?? 'H'}</span>
           {homes?.length ? (
-            <label className="home-select-wrap">
-              <span className="sr-only">Select household</span>
-              <select
-                value={homeId ?? ''}
-                onChange={(event) => selectHome(event.target.value)}
-                disabled={isHomesPending}
-              >
-                {homes.map((item) => (
-                  <option value={item.id} key={item.id}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
-              <small>{home ? 'Active household' : 'Loading household…'}</small>
-            </label>
+            <DropdownMenuPrimitive.Root>
+              <DropdownMenuPrimitive.Trigger asChild>
+                <button
+                  type="button"
+                  className="home-switcher-trigger"
+                  aria-label={`Change household. Current household: ${home?.name ?? 'loading'}`}
+                  disabled={isHomesPending}
+                >
+                  <span className="home-switcher-copy">
+                    <b>{home?.name ?? 'Loading household…'}</b>
+                    <small>Active household</small>
+                  </span>
+                  <ChevronDown size={16} aria-hidden="true" />
+                </button>
+              </DropdownMenuPrimitive.Trigger>
+              <DropdownMenuPrimitive.Portal>
+                <DropdownMenuPrimitive.Content
+                  className="home-menu-content"
+                  align="start"
+                  sideOffset={8}
+                  aria-label="Households"
+                >
+                  <DropdownMenuPrimitive.Label className="home-menu-label">
+                    SWITCH HOUSEHOLD
+                  </DropdownMenuPrimitive.Label>
+                  <DropdownMenuPrimitive.Separator className="home-menu-separator" />
+                  {homes.map((item) => {
+                    const isSelected = item.id === homeId
+
+                    return (
+                      <DropdownMenuPrimitive.Item
+                        key={item.id}
+                        className="home-menu-item"
+                        onSelect={() => selectHome(item.id)}
+                        aria-current={isSelected ? 'true' : undefined}
+                      >
+                        <span className="home-menu-avatar" aria-hidden="true">
+                          {item.name.charAt(0).toUpperCase()}
+                        </span>
+                        <span className="home-menu-item-copy">
+                          <b>{item.name}</b>
+                          {isSelected && <small>Current household</small>}
+                        </span>
+                        {isSelected && <Check size={16} aria-hidden="true" />}
+                      </DropdownMenuPrimitive.Item>
+                    )
+                  })}
+                </DropdownMenuPrimitive.Content>
+              </DropdownMenuPrimitive.Portal>
+            </DropdownMenuPrimitive.Root>
           ) : (
             <Link to="/setup" className="home-select-wrap">
               <b>{isHomesPending ? 'Loading homes…' : 'No household'}</b>

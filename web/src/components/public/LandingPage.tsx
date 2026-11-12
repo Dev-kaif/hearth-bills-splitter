@@ -13,7 +13,7 @@ const benefits = [
   {
     icon: CircleDollarSign,
     title: 'A fair split, every time',
-    description: 'Bills are divided evenly, with every paise accounted for.',
+    description: 'Bills are divided evenly, with every cent accounted for.',
   },
   {
     icon: ReceiptText,

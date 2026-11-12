@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { CalendarDays, CircleAlert, Plus, ReceiptText, Users } from 'lucide-react'
 import type { BillShare } from '../../lib/api/types'
-import { formatINR } from '../../lib/money'
+import { formatUSDCents } from '../../lib/money'
 import { useBills } from '../../hooks/useHouseholdQueries'
 import { BillDialog } from '../dialogs/BillDialog'
 import { PaymentDialog } from '../dialogs/PaymentDialog'
@@ -150,7 +150,7 @@ export function BillsPage() {
                           <div>
                             <h2>{bill.title}</h2>
                             <p>
-                              {displayDate(bill.createdAt)} · {formatINR(bill.totalCents)}
+                              {displayDate(bill.createdAt)} · {formatUSDCents(bill.totalCents)}
                             </p>
                           </div>
                         </div>
@@ -178,7 +178,7 @@ export function BillsPage() {
                                 {share.paidAt ? `Paid ${displayDate(share.paidAt)}` : 'Outstanding'}
                               </small>
                             </div>
-                            <strong>{formatINR(share.amountCents)}</strong>
+                            <strong>{formatUSDCents(share.amountCents)}</strong>
                             {isPaid ? (
                               <span className="status-pill status-paid">
                                 <i /> Paid

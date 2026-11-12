@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router'
 import { ArrowUpRight, CircleDollarSign, Plus, ReceiptText, Sprout, Users } from 'lucide-react'
 import { useBalances } from '../../hooks/useHouseholdQueries'
 import { useBills } from '../../hooks/useHouseholdQueries'
-import { formatINR } from '../../lib/money'
+import { formatUSDCents } from '../../lib/money'
 import { EmptyState } from '../EmptyState'
 import { useHousehold } from '../HouseholdContext'
 
@@ -31,7 +31,10 @@ export function DashboardPage() {
   } = useHousehold()
   const bills = useBills(homeId)
   const balances = useBalances(homeId)
-  const totalOwed = balances.data?.reduce((total, balance) => total + balance.outstandingCents, 0)
+  const totalOwed = balances.data?.reduce(
+    (total, balance) => total + BigInt(balance.outstandingCents),
+    0n,
+  )
   const loadingHousehold = isHomesPending || Boolean(homeId && isHomePending)
   const householdError = homesError ?? homeError
 
@@ -132,7 +135,7 @@ export function DashboardPage() {
               <CircleDollarSign size={18} />
             </span>
             <span className="metric-value">
-              {balances.isPending ? '…' : totalOwed === undefined ? '—' : formatINR(totalOwed)}
+              {balances.isPending ? '…' : totalOwed === undefined ? '—' : formatUSDCents(totalOwed)}
             </span>
           </div>
           <p>{balances.isError ? 'Could not load balances' : 'Across household members'}</p>
@@ -205,7 +208,7 @@ export function DashboardPage() {
                     <b>{bill.title}</b>
                     <small>{formatDate(bill.createdAt)}</small>
                   </div>
-                  <strong>{formatINR(bill.totalCents)}</strong>
+                  <strong>{formatUSDCents(bill.totalCents)}</strong>
                 </div>
               ))}
             </div>
@@ -241,7 +244,7 @@ export function DashboardPage() {
                   <span className="member-avatar">{balance.name.charAt(0).toUpperCase()}</span>
                   <b>{balance.name}</b>
                   <strong className={balance.outstandingCents ? 'amount-due' : 'amount-clear'}>
-                    {formatINR(balance.outstandingCents)}
+                    {formatUSDCents(balance.outstandingCents)}
                   </strong>
                 </div>
               ))}

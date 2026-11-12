@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useCreateBill } from '../../hooks/useMutations'
-import { parseRupeesToPaise } from '../../lib/money'
+import { parseDollarsToCents } from '../../lib/money'
 import type { CreatedBill } from '../../lib/api/types'
 import { useHousehold } from '../HouseholdContext'
 import { Dialog } from './Dialog'
@@ -22,7 +22,7 @@ export function BillDialog({
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const cleanTitle = title.trim()
-    const cents = parseRupeesToPaise(amount)
+    const cents = parseDollarsToCents(amount)
     if (!cleanTitle || cleanTitle.length > 160) {
       setError('Enter a bill title up to 160 characters.')
       return
@@ -63,16 +63,16 @@ export function BillDialog({
         <label>
           Total amount
           <div className="money-input">
-            <span>₹</span>
+            <span>$</span>
             <input
               inputMode="decimal"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
-              aria-label="Total amount in rupees"
+              aria-label="Total amount in dollars"
             />
           </div>
-          <small>Enter rupees and paise, for example 1250.50.</small>
+          <small>Enter dollars and cents, for example 1250.50.</small>
         </label>
         {error && (
           <p className="form-error" role="alert">

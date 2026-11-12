@@ -1,18 +1,32 @@
-export function parseRupeesToPaise(raw: string): number | null {
+const usdFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+})
+
+export function parseDollarsToCents(raw: string): number | null {
   const value = raw.trim()
   if (!/^\d+(?:\.\d{1,2})?$/.test(value)) return null
-  const [rupees = '', paise = ''] = value.split('.')
-  const cents = BigInt(rupees) * 100n + BigInt(paise.padEnd(2, '0'))
-  return cents > 0n && cents <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(cents) : null
+
+  const [dollars = '', cents = ''] = value.split('.')
+  const totalCents = BigInt(dollars) * 100n + BigInt(cents.padEnd(2, '0'))
+
+  if (totalCents <= 0n || totalCents > BigInt(Number.MAX_SAFE_INTEGER)) return null
+  return Number(totalCents)
 }
 
-export function formatINR(cents: number): string {
-  const negative = cents < 0
-  const absolute = BigInt(Math.abs(cents))
-  const rupees = absolute / 100n
-  const paise = String(absolute % 100n).padStart(2, '0')
-  const formattedRupees = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(
-    Number(rupees),
-  )
-  return `${negative ? '-' : ''}₹${formattedRupees}.${paise}`
+export function formatUSDCents(cents: number | bigint): string {
+  const value =
+    typeof cents === 'bigint' ? cents : Number.isSafeInteger(cents) ? BigInt(cents) : null
+  if (value === null) return '—'
+
+  const negative = value < 0n
+  const absolute = negative ? -value : value
+  const wholeDollars = absolute / 100n
+  const fraction = String(absolute % 100n).padStart(2, '0')
+  const formatted = usdFormatter
+    .formatToParts(wholeDollars)
+    .map((part) => (part.type === 'fraction' ? fraction : part.value))
+    .join('')
+
+  return negative ? `-${formatted}` : formatted
 }
